@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+// Локалдык маалыматты импорттоо
+import { proverbsData as localProverbs } from '../data/proverbsData';
 
 interface Proverb {
   id: number;
@@ -19,16 +21,34 @@ const ProverbsGame: React.FC = () => {
   const [isFinished, setIsFinished] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // 1. Маалыматты жүктөө
+  // Суроолорду аралаштыруу функциясы
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const shuffleArray = (array: any[]) => {
+    return [...array].sort(() => Math.random() - 0.5);
+  };
+
+  // 1. Маалыматты жүктөө (Бекенд + Fallback)
   const fetchProverbs = useCallback(async () => {
     try {
       setLoading(true);
       const res = await fetch('http://localhost:5000/api/proverbs/data');
-      if (!res.ok) throw new Error('Network response was not ok');
+      
+      if (!res.ok) throw new Error('Бекенд жооп берген жок');
+      
       const data = await res.json();
-      setQuestions(data);
+      
+      if (data && data.length > 0) {
+        // Бекендден келген 10 суроону аралаштырып ал
+        setQuestions(shuffleArray(data).slice(0, 10));
+      } else {
+        // Эгер бекенд бош болсо локалдыктан 10 суроо ал
+        setQuestions(shuffleArray(localProverbs).slice(0, 10));
+      }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
-      console.error("Ката:", err);
+      console.warn("Бекенд иштебейт, локалдык маалыматтар колдонулууда");
+      // Ката болсо локалдыктан 10 суроо ал
+      setQuestions(shuffleArray(localProverbs).slice(0, 10));
     } finally {
       setLoading(false);
     }
@@ -44,10 +64,14 @@ const ProverbsGame: React.FC = () => {
       await fetch('http://localhost:5000/api/proverbs/score', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ score: finalScore }),
+        body: JSON.stringify({ 
+          username: "Окуучу", // Кошумча атын кошсоңуз болот
+          score: finalScore,
+          date: new Date().toISOString()
+        }),
       });
     } catch (err) {
-      console.error("Сакталган жок:", err);
+      console.error("Упай сакталган жок:", err);
     }
   };
 
@@ -70,8 +94,7 @@ const ProverbsGame: React.FC = () => {
       setIsCorrect(null);
     } else {
       setIsFinished(true);
-      // Упайды акыркы абалы менен жиберүү
-      saveFinalScore(isCorrect ? score + 0 : score); 
+      saveFinalScore(score); 
     }
   };
 
@@ -81,7 +104,7 @@ const ProverbsGame: React.FC = () => {
     setSelected(null);
     setIsCorrect(null);
     setIsFinished(false);
-    fetchProverbs(); // Жаңы суроолорду алуу үчүн
+    fetchProverbs();
   };
 
   if (loading) return <div style={styles.container}>Жүктөлүүдө...</div>;
@@ -128,7 +151,7 @@ const ProverbsGame: React.FC = () => {
         </div>
         
         <p style={styles.stepText}>МАКАЛ {currentIdx + 1} / {questions.length}</p>
-        <h2 style={styles.questionText}>"{q.start} ..."</h2>
+        <h2 style={styles.questionText}>"{q.start}"</h2>
 
         <div style={styles.optionsGrid}>
           {q.options.map((opt, i) => {
@@ -141,6 +164,8 @@ const ProverbsGame: React.FC = () => {
                 currentBg = '#C6F6D5'; currentBorder = '#48BB78'; currentText = '#22543D';
               } else if (selected === i) {
                 currentBg = '#FED7D7'; currentBorder = '#F56565'; currentText = '#822727';
+              } else {
+                currentBg = '#F7FAFC'; currentBorder = '#E2E8F0'; currentText = '#A0AEC0';
               }
             }
 
@@ -176,7 +201,7 @@ const ProverbsGame: React.FC = () => {
             }}>
               {isCorrect ? '✅ ТУУРА ЖООП!' : '❌ КАТАЛДЫҢЫЗ'}
             </p>
-            <p style={styles.explanation}><b>Мааниси:</b> {q.explanation}</p>
+            <p style={styles.explanation}><b>Макалдын толук түрү:</b> {q.explanation}</p>
             <button onClick={handleNext} style={styles.nextBtn}>
               {currentIdx === questions.length - 1 ? 'Жыйынтыкты көрүү' : 'Кийинкиси →'}
             </button>
@@ -193,9 +218,8 @@ const ProverbsGame: React.FC = () => {
   );
 };
 
-// Стилдер өзгөрүүсүз калды...
 const styles: { [key: string]: React.CSSProperties } = {
-  container: { padding: '40px 20px', maxWidth: '850px', margin: '0 auto', minHeight: '100vh' },
+  container: { padding: '40px 20px', maxWidth: '850px', margin: '0 auto', minHeight: '100vh', background: '#F8FAFC' },
   header: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' },
   backBtn: { background: 'white', border: '1px solid #e2e8f0', padding: '10px 20px', borderRadius: '14px', color: '#4A5568', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center' },
   stats: { background: '#3182CE', color: 'white', padding: '10px 25px', borderRadius: '14px', fontWeight: 'bold', fontSize: '18px' },

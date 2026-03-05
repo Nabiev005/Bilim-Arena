@@ -1,5 +1,5 @@
-import { Routes, Route } from 'react-router-dom';
-import Sidebar from './components/Sidebar'; // Sidebar импорттоону унутпаңыз
+import { Routes, Route, useLocation } from 'react-router-dom'; // useLocation кошулду
+import Sidebar from './components/Sidebar';
 import Home from './pages/Home';
 import GrammarGame from './pages/GrammarGame';
 import ProverbsGame from './pages/ProverbsGame';
@@ -19,15 +19,28 @@ import MathSection from './pages/ORT/MathSection';
 import KyrgyzLanguage from './pages/ORT/KyrgyzLanguage';
 import Reading from './pages/ORT/Reading';
 import Leaderboard from './pages/ORT/Leaderboard';
+import AkTerekGame from './pages/AkTerekGame';
+import AdminPage from './pages/ORT/AdminPage';
 
 function App() {
+  // 1. Учурдагы даректи аныктайбыз
+  const location = useLocation();
+  
+  // 2. Эгер дарек '/admin-panel' болсо, isAdminPage true болот
+  const isAdminPage = location.pathname === '/admin-panel';
+
   return (
     <div style={{ display: 'flex', minHeight: '100vh' }}>
-      {/* 1. Sidebar ар дайым сол жакта турат */}
-      <Sidebar />
+      {/* 3. Эгер админ панелде эмес болсок гана Sidebar көрсөтүлөт */}
+      {!isAdminPage && <Sidebar />}
 
-      {/* 2. Негизги мазмун оң жакта турат */}
-      <main style={{ flex: 1, background: '#F8FAFC', position: 'relative' }}>
+      {/* 4. Негизги мазмун оң жакта турат. Админ панелде marginLeft болбойт */}
+      <main style={{ 
+        flex: 1, 
+        background: '#F8FAFC', 
+        position: 'relative',
+        width: '100%' 
+      }}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/grammar" element={<GrammarGame />} />
@@ -48,6 +61,10 @@ function App() {
           <Route path="/ort/kyrgyz-language" element={<KyrgyzLanguage />} />
           <Route path="/ort/reading" element={<Reading />} />
           <Route path="/ort/leaderboard" element={<Leaderboard />} />
+          <Route path="/ak-terek" element={<AkTerekGame />} />
+          
+          {/* Админ панель */}
+          <Route path="/admin-panel" element={<AdminPage />} />
         </Routes>
       </main>
     </div>

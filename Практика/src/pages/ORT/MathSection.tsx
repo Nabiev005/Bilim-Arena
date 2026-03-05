@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { FaArrowLeft, FaCheck, FaTimes, FaRedo, FaSpinner, FaCloudUploadAlt, FaCalculator } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+// Маалыматты сырттан импорттоо
+import { mathQuestions } from '../../data/mathData'; 
 
 const MathSection: React.FC = () => {
   const navigate = useNavigate();
@@ -13,32 +15,8 @@ const MathSection: React.FC = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
 
-  const questions = [
-    {
-      title: "Сандык салыштыруу",
-      columnA: "5² (5тин квадраты)",
-      columnB: "3³ (3түн кубу)",
-      options: ["А тилкеси чоң", "Б тилкеси чоң", "А жана Б барабар", "Маалымат жетишсиз"],
-      correct: 1,
-      explanation: "5² = 25, ал эми 3³ = 27. Демек, 25 < 27 болгондуктан, Б тилкеси чоң."
-    },
-    {
-      title: "Геометрия",
-      columnA: "Тик бурчтуктун аянты (4 жана 6)",
-      columnB: "Квадраттын аянты (жагы 5)",
-      options: ["А тилкеси чоң", "Б тилкеси чоң", "А жана Б барабар", "Маалымат жетишсиз"],
-      correct: 1,
-      explanation: "Тик бурчтуктун аянты: 4 * 6 = 24. Квадраттын аянты: 5 * 5 = 25. 24 < 25."
-    },
-    {
-      title: "Бөлчөктөр",
-      columnA: "3/4",
-      columnB: "0.75",
-      options: ["А тилкеси чоң", "Б тилкеси чоң", "А жана Б барабар", "Маалымат жетишсиз"],
-      correct: 2,
-      explanation: "3/4 бөлчөгү ондук түрдө 0.75ке барабар. Ошондуктан эки тилке барабар."
-    }
-  ];
+  // Учурдагы суроону алуу
+  const currentQ = mathQuestions[currentQuestion];
 
   const saveScoreToBackend = async () => {
     if (!username.trim()) {
@@ -54,7 +32,7 @@ const MathSection: React.FC = () => {
           username,
           subject: 'Математика',
           score,
-          total: questions.length
+          total: mathQuestions.length
         })
       });
       if (response.ok) setIsSaved(true);
@@ -69,10 +47,10 @@ const MathSection: React.FC = () => {
   const handleAnswer = (idx: number) => {
     if (selectedAnswer !== null) return;
     setSelectedAnswer(idx);
-    if (idx === questions[currentQuestion].correct) setScore(score + 1);
+    if (idx === currentQ.correct) setScore(score + 1);
 
     setTimeout(() => {
-      if (currentQuestion + 1 < questions.length) {
+      if (currentQuestion + 1 < mathQuestions.length) {
         setCurrentQuestion(prev => prev + 1);
         setSelectedAnswer(null);
       } else {
@@ -90,29 +68,28 @@ const MathSection: React.FC = () => {
       {!showResult ? (
         <div style={styles.quizCard}>
           <div style={styles.header}>
-             <div style={styles.topicBadge}><FaCalculator /> {questions[currentQuestion].title}</div>
-             <span style={styles.counter}>{currentQuestion + 1} / {questions.length}</span>
+             <div style={styles.topicBadge}><FaCalculator /> {currentQ.title}</div>
+             <span style={styles.counter}>{currentQuestion + 1} / {mathQuestions.length}</span>
           </div>
 
           <div style={styles.comparisonGrid}>
             <div style={{...styles.columnBox, borderLeft: '6px solid #3B82F6'}}>
               <span style={styles.columnLabel}>А тилкеси</span>
-              <div style={styles.columnValue}>{questions[currentQuestion].columnA}</div>
+              <div style={styles.columnValue}>{currentQ.columnA}</div>
             </div>
             
             <div style={styles.vsCircle}>VS</div>
             
             <div style={{...styles.columnBox, borderLeft: '6px solid #F59E0B'}}>
               <span style={styles.columnLabel}>Б тилкеси</span>
-              <div style={styles.columnValue}>{questions[currentQuestion].columnB}</div>
+              <div style={styles.columnValue}>{currentQ.columnB}</div>
             </div>
           </div>
 
-          
-
           <div style={styles.optionsList}>
-            {questions[currentQuestion].options.map((opt, idx) => {
-              const isCorrect = idx === questions[currentQuestion].correct;
+            {/* opt жана idx типтери кошулду, ката болбошу үчүн */}
+            {currentQ.options.map((opt: string, idx: number) => {
+              const isCorrect = idx === currentQ.correct;
               const isSelected = selectedAnswer === idx;
               return (
                 <button 
@@ -123,6 +100,7 @@ const MathSection: React.FC = () => {
                     ...styles.optBtn,
                     borderColor: isSelected ? (isCorrect ? '#10B981' : '#EF4444') : (selectedAnswer !== null && isCorrect ? '#10B981' : '#F1F5F9'),
                     background: isSelected ? (isCorrect ? '#ECFDF5' : '#FEF2F2') : '#fff',
+                    cursor: selectedAnswer !== null ? 'default' : 'pointer'
                   }}
                 >
                   <span>{opt}</span>
@@ -134,7 +112,7 @@ const MathSection: React.FC = () => {
 
           {selectedAnswer !== null && (
             <div style={styles.explanationBox}>
-              <strong>Түшүндүрмө:</strong> {questions[currentQuestion].explanation}
+              <strong>Түшүндүрмө:</strong> {currentQ.explanation}
             </div>
           )}
         </div>
@@ -144,7 +122,7 @@ const MathSection: React.FC = () => {
             <>
               <div style={styles.resultIcon}>🎯</div>
               <h2 style={styles.resultTitle}>Жыйынтык</h2>
-              <div style={styles.finalScore}>{score} / {questions.length}</div>
+              <div style={styles.finalScore}>{score} / {mathQuestions.length}</div>
               <input 
                 type="text" 
                 placeholder="Атыңызды жазыңыз..." 
@@ -159,12 +137,16 @@ const MathSection: React.FC = () => {
           ) : (
             <>
               <div style={{...styles.resultIcon, color: '#10B981'}}><FaCheck /></div>
-              <h2 style={styles.resultTitle}>Ийгиликтүү!</h2>
+              <h2 style={styles.resultTitle}>Ийгиликтүү сакталды!</h2>
               <button onClick={() => window.location.reload()} style={styles.retryBtn}><FaRedo /> Кайра баштоо</button>
             </>
           )}
         </div>
       )}
+      <style>{`
+        .spinner { animation: spin 1s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+      `}</style>
     </div>
   );
 };

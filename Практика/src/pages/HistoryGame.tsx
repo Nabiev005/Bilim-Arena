@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
+import { historyData as localHistoryData } from '../data/historyData'; // Жаңы маалыматтар
 
 interface HistoryEvent {
   id: number;
@@ -20,28 +21,38 @@ const HistoryGame: React.FC = () => {
 
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
-  // Маалыматты жүктөө
   const loadGame = useCallback(async () => {
     try {
       setLoading(true);
       const response = await fetch(`${API_URL}/api/history`);
-      if (!response.ok) throw new Error('Network error');
-      const data: HistoryEvent[] = await response.json();
+      let data: HistoryEvent[] = [];
+      
+      if (response.ok) {
+        data = await response.json();
+      }
 
+      // Эгер бекенд бош болсо же ката берсе, локалдык маалыматты ал
+      if (data.length === 0) {
+        // Бардык 40 окуянын ичинен туш келди 5 окуяны тандап алабыз
+        const randomBatch = [...localHistoryData]
+          .sort(() => Math.random() - 0.5)
+          .slice(0, 5);
+        data = randomBatch;
+      }
+
+      // Туура тартипти IDлер аркылуу сактоо (correct_order боюнча иреттеп)
       const sortedIds = [...data].sort((a, b) => a.correct_order - b.correct_order).map(e => e.id);
       setCorrectIds(sortedIds);
+      
+      // Оюнчуга аралаштырып көрсөтүү
       setShuffledEvents([...data].sort(() => Math.random() - 0.5));
+      
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      console.error("Ката кетти:", error);
-      // Камдык маалыматтар (Fallback data)
-      const fallbackData: HistoryEvent[] = [
-        { id: 1, year: "1200", event: "Улуу Кыргыз Дөөлөтү", description: "Кыргыздардын гүлдөгөн доору", correct_order: 1 },
-        { id: 2, year: "1924", event: "Кара-Кыргыз автономиялуу облусу", description: "Заманбап мамлекеттүүлүктүн башаты", correct_order: 2 },
-        { id: 3, year: "1991", event: "Эгемендүүлүк күнү", description: "Кыргызстан өз алдынча мамлекет болду", correct_order: 3 },
-        { id: 4, year: "2010", event: "Элдик революция", description: "Демократиялык өзгөрүүлөр", correct_order: 4 },
-      ];
-      setCorrectIds(fallbackData.map(e => e.id));
-      setShuffledEvents([...fallbackData].sort(() => Math.random() - 0.5));
+      console.error("Ката кетти, локалдык маалымат жүктөлүүдө");
+      const randomBatch = [...localHistoryData].sort(() => Math.random() - 0.5).slice(0, 5);
+      setCorrectIds([...randomBatch].sort((a,b) => a.correct_order - b.correct_order).map(e => e.id));
+      setShuffledEvents(randomBatch);
     } finally {
       setShowFeedback(false);
       setIsWon(false);
@@ -57,13 +68,10 @@ const HistoryGame: React.FC = () => {
     if (isWon) return;
     const newEvents = [...shuffledEvents];
     const nextIndex = direction === 'up' ? index - 1 : index + 1;
-    
     if (nextIndex < 0 || nextIndex >= newEvents.length) return;
-    
-    // Элементтердин ордун алмаштыруу
     [newEvents[index], newEvents[nextIndex]] = [newEvents[nextIndex], newEvents[index]];
     setShuffledEvents(newEvents);
-    setShowFeedback(false); // Ордун алмаштырганда эскертүүнү өчүрүү
+    setShowFeedback(false);
   };
 
   const checkResult = () => {
@@ -81,7 +89,7 @@ const HistoryGame: React.FC = () => {
       <main style={styles.content}>
         <div style={styles.topActions}>
           <button onClick={() => navigate(-1)} style={styles.backBtn}>← Артка</button>
-          <button onClick={loadGame} style={styles.resetBtn}>🔄 Жаңылоо</button>
+          <button onClick={loadGame} style={styles.resetBtn}>🔄 Жаңы оюн</button>
         </div>
 
         <div style={styles.gameHeader}>
@@ -97,7 +105,7 @@ const HistoryGame: React.FC = () => {
               style={{
                 ...styles.eventCard,
                 borderColor: showFeedback ? (isWon ? '#48BB78' : '#F56565') : '#E2E8F0',
-                transform: showFeedback && !isWon ? 'translateX(0)' : 'none'
+                boxShadow: isWon ? '0 0 15px rgba(72, 187, 120, 0.2)' : 'none'
               }}
             >
               <div style={styles.controls}>
@@ -131,7 +139,7 @@ const HistoryGame: React.FC = () => {
           {!isWon ? (
             <button onClick={checkResult} style={styles.checkBtn}>Текшерүү</button>
           ) : (
-            <button onClick={() => window.location.reload()} style={{...styles.checkBtn, background: '#48BB78'}}>
+            <button onClick={loadGame} style={{...styles.checkBtn, background: '#48BB78'}}>
               Кийинки деңгээл →
             </button>
           )}

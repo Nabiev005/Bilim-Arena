@@ -28,14 +28,12 @@ const ChukoGame: React.FC = () => {
 
   const checkCollision = useCallback((finalX: number, finalY: number) => {
     setChukos(prevChukos => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      let hit = false;
+
       const nextChukos = prevChukos.map(chuko => {
         const distance = Math.sqrt(
           Math.pow(finalX - chuko.x, 2) + Math.pow(finalY - chuko.y, 2)
         );
         if (chuko.active && distance < 70) {
-          hit = true;
           setScore(s => s + (chuko.isKhan ? 100 : 20));
           return { ...chuko, active: false };
         }

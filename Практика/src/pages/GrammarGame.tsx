@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaArrowLeft, FaLightbulb, FaTrophy, FaClock, FaHeart } from 'react-icons/fa';
+// Жогорудагы 40 суроону камтыган файлды импорттойбуз
+import { grammarData as localQuestions } from '../data/grammarData'; 
 
 interface Question {
   id: number;
@@ -28,7 +30,12 @@ const GrammarGame: React.FC = () => {
 
   const API_BASE = (import.meta.env?.VITE_API_URL as string | undefined) || 'http://localhost:5000';
 
-  // Таймерди токтотуу
+  // Суроолорду аралаштыруу функциясы
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const shuffleArray = (array: any[]) => {
+    return [...array].sort(() => Math.random() - 0.5);
+  };
+
   const stopTimer = useCallback(() => {
     if (timerRef.current) {
       clearInterval(timerRef.current);
@@ -36,26 +43,23 @@ const GrammarGame: React.FC = () => {
     }
   }, []);
 
-  // Оюнду бүтүрүү
   const finishGame = useCallback((finalScore: number) => {
     if (isGameOverRef.current) return;
     isGameOverRef.current = true;
     stopTimer();
     setIsFinished(true);
 
-    // Упайды сактоо
     fetch(`${API_BASE}/api/grammar/score`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ 
         username: "Окуучу",
         score: finalScore,
-        date: new Date().toISOString()
+        date: new Date().toLocaleString('ky-KG')
       }),
     }).catch(err => console.error("Score save error:", err));
   }, [API_BASE, stopTimer]);
 
-  // Убакыт бүткөндөгү логика
   const handleTimeout = useCallback(() => {
     setLives((prev) => {
       const newLives = prev - 1;
@@ -68,7 +72,6 @@ const GrammarGame: React.FC = () => {
     });
   }, [score, finishGame]);
 
-  // Таймерди иштетүү
   const startTimer = useCallback(() => {
     stopTimer();
     setTimeLeft(30);
@@ -84,24 +87,24 @@ const GrammarGame: React.FC = () => {
     }, 1000);
   }, [stopTimer, handleTimeout]);
 
-  // Суроолорду жүктөө
+  // СУРООЛОРДУ ЖҮКТӨӨ (Бекенд + Локалдык камдык)
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
         const res = await fetch(`${API_BASE}/api/grammar/questions`);
-        if (!res.ok) throw new Error('Network error');
+        if (!res.ok) throw new Error('Бекендден маалымат келген жок');
         const data = await res.json();
-        setQuestions(data);
+        
+        // Эгер базада суроо жок болсо, локалдык суроолорду ал
+        if (data.length === 0) {
+          setQuestions(shuffleArray(localQuestions));
+        } else {
+          setQuestions(shuffleArray(data));
+        }
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (err) {
-        console.error("Fetch error:", err);
-        // Fallback data
-        setQuestions([{
-          id: 1,
-          question: "Кыргыз тилинде канча созулма үндүү бар?",
-          options: ["4", "6", "8", "5"],
-          correct: 1,
-          explanation: "Кыргыз тилинде 6 созулма үндүү бар: аа, оо, уу, ээ, өө, үү."
-        }]);
+        console.warn("Бекенд катасы, локалдык суроолор колдонулууда");
+        setQuestions(shuffleArray(localQuestions));
       } finally {
         setLoading(false);
       }
@@ -109,7 +112,6 @@ const GrammarGame: React.FC = () => {
     fetchQuestions();
   }, [API_BASE]);
 
-  // Таймерди көзөмөлдөө
   useEffect(() => {
     if (questions.length > 0 && !isFinished && !showFeedback && !isGameOverRef.current) {
       startTimer();
@@ -130,7 +132,7 @@ const GrammarGame: React.FC = () => {
       setLives((prev) => {
         const newLives = prev - 1;
         if (newLives <= 0) {
-          setTimeout(() => finishGame(score), 800);
+          setTimeout(() => finishGame(score), 1000);
         }
         return newLives;
       });
@@ -173,7 +175,10 @@ const GrammarGame: React.FC = () => {
   return (
     <div style={styles.container}>
       <div style={styles.statsBar}>
-        <div style={styles.statItem}><FaHeart color="#F56565" /> <span style={{marginLeft: 8}}>{lives}</span></div>
+        <div style={styles.statItem}>
+            <FaHeart color="#F56565" /> 
+            <span style={{marginLeft: 8}}>{lives}</span>
+        </div>
         <div style={{...styles.statItem, color: timeLeft < 10 ? '#EF4444' : '#475569'}}>
           <FaClock /> <span style={{marginLeft: 8, width: '50px'}}>{timeLeft}с</span>
         </div>
@@ -185,6 +190,7 @@ const GrammarGame: React.FC = () => {
         <div style={styles.progressTrack}>
           <div style={{ ...styles.progressFill, width: `${((currentIdx + 1) / questions.length) * 100}%` }} />
         </div>
+        <span style={{fontWeight: '800', fontSize: '14px'}}>{currentIdx + 1}/{questions.length}</span>
       </div>
 
       <div style={styles.quizCard}>
@@ -225,6 +231,7 @@ const GrammarGame: React.FC = () => {
   );
 };
 
+// Стилдер (өзгөртүүсүз калды)
 const styles: { [key: string]: React.CSSProperties } = {
   container: { minHeight: '100vh', background: '#F1F5F9', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '20px' },
   centerBox: { height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748b', fontSize: '1.2rem' },

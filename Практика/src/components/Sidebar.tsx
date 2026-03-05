@@ -5,9 +5,8 @@ import {
   FaHome, FaBook, FaQuoteLeft, FaHorse, FaMoon, FaBullseye, FaTrophy, 
   FaGraduationCap, FaShieldAlt
 } from 'react-icons/fa';
-import { HiMenuAlt2, HiChevronLeft } from 'react-icons/hi';
+import { HiMenuAlt2, HiChevronLeft, HiX } from 'react-icons/hi'; // HiX кошулду
 
-// 1. Логотиптин сүрөтүн импорттоо (assets папкасында экенин текшериңиз)
 import logoImg from '../assets/logo2.png'; 
 
 const Sidebar: React.FC = () => {
@@ -67,7 +66,6 @@ const Sidebar: React.FC = () => {
 
   return (
     <>
-      {/* 1. Мобилдик Overlay */}
       {isMobile && isOpen && (
         <div 
           onClick={() => setIsOpen(false)} 
@@ -76,7 +74,6 @@ const Sidebar: React.FC = () => {
         />
       )}
 
-      {/* 2. Негизги Sidebar */}
       <nav 
         aria-label="Main Sidebar"
         style={{
@@ -84,10 +81,11 @@ const Sidebar: React.FC = () => {
           width: isOpen ? '280px' : (isMobile ? '0px' : '85px'),
           transform: isMobile && !isOpen ? 'translateX(-100%)' : 'translateX(0)',
           visibility: isMobile && !isOpen ? 'hidden' : 'visible',
+          // Мобилдикте көлөкө кошуп, ажыратып көрсөтүү үчүн
+          boxShadow: isMobile && isOpen ? '10px 0 30px rgba(0,0,0,0.1)' : 'none',
         }}
       >
         
-        {/* Sidebar Header - Bilim Arena Logo */}
         <div style={{
           ...styles.header,
           justifyContent: isOpen ? 'space-between' : 'center',
@@ -95,7 +93,6 @@ const Sidebar: React.FC = () => {
         }}>
           {isOpen && (
             <div style={styles.logoWrapper}>
-              {/* 2. Эмодзинин ордуна сүрөттү (img) койдук */}
               <div style={styles.logoIcon} aria-hidden="true">
                 <img 
                   src={logoImg} 
@@ -109,16 +106,17 @@ const Sidebar: React.FC = () => {
               </div>
             </div>
           )}
-          <button 
-            onClick={() => setIsOpen(!isOpen)} 
-            style={styles.toggleBtn}
-            aria-label={isOpen ? "Менюну жабуу" : "Менюну ачуу"}
-          >
-            {isOpen ? <HiChevronLeft size={20} /> : <HiMenuAlt2 size={20} />}
-          </button>
+          {/* Десктоп версиядагы жебе (Мобилдикте жашырылат) */}
+          {!isMobile && (
+            <button 
+              onClick={() => setIsOpen(!isOpen)} 
+              style={styles.toggleBtn}
+            >
+              {isOpen ? <HiChevronLeft size={20} /> : <HiMenuAlt2 size={20} />}
+            </button>
+          )}
         </div>
 
-        {/* Меню контейнери */}
         <div style={styles.menuContainer} className="custom-scrollbar">
           {sections.map((section, sIdx) => (
             <section key={`sec-${sIdx}`} style={{ marginBottom: '25px' }}>
@@ -160,7 +158,6 @@ const Sidebar: React.FC = () => {
           ))}
         </div>
 
-        {/* Footer */}
         <div style={{
           ...styles.footer,
           alignItems: isOpen ? 'flex-start' : 'center',
@@ -188,13 +185,20 @@ const Sidebar: React.FC = () => {
         </div>
       </nav>
 
-      {/* Мобилдик Бургер */}
-      {isMobile && !isOpen && (
+      {/* ЖАҢЫ МОБИЛДИК БУРГЕР (Floating Button) */}
+      {isMobile && (
         <button 
-          onClick={() => setIsOpen(true)} 
-          style={styles.mobileBurgerBtn}
+          onClick={() => setIsOpen(!isOpen)} 
+          style={{
+            ...styles.mobileBurgerBtn,
+            // Эгер меню ачык болсо, кнопка оңго жылат (Sidebar ичине киргендей болот) же өңүн өзгөртөт
+            left: isOpen ? '230px' : '20px',
+            backgroundColor: isOpen ? '#3B82F6' : '#ffffff',
+            color: isOpen ? '#ffffff' : '#3B82F6',
+            transform: `rotate(${isOpen ? '180deg' : '0deg'})`,
+          }}
         >
-          <HiMenuAlt2 />
+          {isOpen ? <HiX /> : <HiMenuAlt2 />}
         </button>
       )}
 
@@ -209,7 +213,6 @@ const Sidebar: React.FC = () => {
   );
 };
 
-// Стилдер бөлүмүндөгү logoIcon жаңыртылды (сүрөт үчүн оптималдаштырылды)
 const styles: { [key: string]: React.CSSProperties } = {
   sidebar: {
     position: 'fixed',
@@ -219,7 +222,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     background: '#ffffff',
     borderRight: '1px solid #f1f5f9',
     padding: '25px 0',
-    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+    transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1)', // Анимация жумшартылды
     zIndex: 1001,
     display: 'flex',
     flexDirection: 'column',
@@ -231,27 +234,26 @@ const styles: { [key: string]: React.CSSProperties } = {
     left: 0,
     width: '100vw',
     height: '100vh',
-    background: 'rgba(15, 23, 42, 0.4)',
-    backdropFilter: 'blur(4px)',
+    background: 'rgba(15, 23, 42, 0.3)',
+    backdropFilter: 'blur(8px)', // Блур көбөйтүлдү
     zIndex: 1000,
+    transition: 'opacity 0.3s ease'
   },
   mobileBurgerBtn: {
     position: 'fixed',
     top: '20px',
-    left: '20px',
-    zIndex: 999,
-    width: '48px',
-    height: '48px',
-    borderRadius: '14px',
-    background: '#ffffff',
-    border: '1px solid #e2e8f0',
-    boxShadow: '0 8px 15px rgba(0,0,0,0.1)',
+    zIndex: 1100, // Sidebar'дан да жогору туруш керек
+    width: '45px',
+    height: '45px',
+    borderRadius: '12px',
+    border: 'none',
+    boxShadow: '0 10px 25px rgba(59, 130, 246, 0.25)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    fontSize: '24px',
-    color: '#3B82F6',
-    cursor: 'pointer'
+    fontSize: '22px',
+    cursor: 'pointer',
+    transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)', // Пружина эффекти
   },
   header: { 
     display: 'flex', 
@@ -267,7 +269,6 @@ const styles: { [key: string]: React.CSSProperties } = {
     alignItems: 'center', 
     justifyContent: 'center', 
     borderRadius: '12px',
-    // Сүрөт фонсуз болгондуктан, контейнердин фонун transparent кылдык
     background: 'transparent',
     overflow: 'hidden'
   },
@@ -303,8 +304,8 @@ const styles: { [key: string]: React.CSSProperties } = {
     display: 'flex',
     alignItems: 'center',
     padding: '14px 16px',
-    borderRadius: '0 14px 14px 0',
-    marginBottom: '4px',
+    borderRadius: '14px', // Бардык бурчу тегеректелди
+    marginBottom: '6px',
     transition: 'all 0.2s ease',
     gap: '14px',
     textDecoration: 'none',

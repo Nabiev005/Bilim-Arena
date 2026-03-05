@@ -5,6 +5,8 @@ import {
   FaClock, FaTextHeight, FaSearchPlus, FaSearchMinus 
 } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+// Маалыматты сырттан импорттоо
+import { readingPassage } from '../../data/readingData';
 
 const Reading: React.FC = () => {
   const navigate = useNavigate();
@@ -17,53 +19,16 @@ const Reading: React.FC = () => {
   
   // Визуалдык параметрлер
   const [fontSize, setFontSize] = useState(17);
-  const [timeLeft, setTimeLeft] = useState(300); // 5 мүнөт (300 секунд)
+  const [timeLeft, setTimeLeft] = useState(600); // 10 мүнөт (600 секунд)
 
   // Колдонуучу жана Сактоо
   const [username, setUsername] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
 
-  const passage = {
-    title: "Тил жана маданият",
-    content: `Тил — бул жөн гана баарлашуунун куралы эмес, ал элдин маданиятынын, тарыхынын жана дүйнө таанымынын күзгүсү. Ар бир тил өзүнө гана мүнөздүү болгон өзгөчөлүктөр аркылуу ошол элдин жашоо образын чагылдырат. Эгерде тил жоголсо, анда ошол элдин кылымдар бою топтогон акыл-эс байлыгы, каада-салты жана өзгөчө көз карашы кошо жок болот. Ошондуктан тилди сактоо — бул улутту сактоо дегендикке жатат. Бүгүнкү ааламдашуу заманында тилдердин өз ара таасир алышуусу күчөп жатат, бирок эне тилдин тазалыгын сактоо ар бир инсандын ыйык милдети бойдон калууда.`,
-  };
-
-  const questions = [
-    {
-      question: "Тексттин негизги ою кайсы?",
-      options: [
-        "А) Ааламдашуу процессинин пайдасы",
-        "Б) Тилдин маданият жана улутту сактоодогу ролу",
-        "В) Тилдердин бири-бирине тийгизген таасири",
-        "Г) Жашоо образын өзгөртүү жолдору"
-      ],
-      correct: 1,
-      explanation: "Текстте тил улуттун жана маданияттун негизи экени баса белгиленген."
-    },
-    {
-      question: "Автордун пикири боюнча, тил жоголсо эмне болот?",
-      options: [
-        "А) Баарлашуу жеңилдейт",
-        "Б) Жаңы тилдер пайда болот",
-        "В) Элдин акыл-эс байлыгы жана тарыхы кошо жоголот",
-        "Г) Элдин саны азаят"
-      ],
-      correct: 2,
-      explanation: "Текстте: 'Тил жоголсо, ошол элдин топтогон акыл-эс байлыгы кошо жок болот' деп ачык айтылган."
-    },
-    {
-      question: "Текстке ылайык, эне тилди сактоо кимдин милдети?",
-      options: [
-        "А) Мамлекеттин гана милдети",
-        "Б) Ар бир инсандын ыйык милдети",
-        "В) Филологдордун милдети",
-        "Г) Келечек муундун милдети"
-      ],
-      correct: 1,
-      explanation: "Тексттин соңунда эне тилди сактоо ар бир инсандын милдети деп көрсөтүлгөн."
-    }
-  ];
+  // Кыска өзгөрмөлөр
+  const currentQ = readingPassage.questions[currentQuestion];
+  const totalQuestions = readingPassage.questions.length;
 
   // Таймер логикасы
   useEffect(() => {
@@ -85,12 +50,12 @@ const Reading: React.FC = () => {
     if (selectedAnswer !== null) return;
     setSelectedAnswer(idx);
     
-    if (idx === questions[currentQuestion].correct) {
+    if (idx === currentQ.correct) {
       setScore(prev => prev + 1);
     }
 
     setTimeout(() => {
-      if (currentQuestion + 1 < questions.length) {
+      if (currentQuestion + 1 < totalQuestions) {
         setCurrentQuestion(prev => prev + 1);
         setSelectedAnswer(null);
       } else {
@@ -103,8 +68,8 @@ const Reading: React.FC = () => {
     if (!username.trim()) { alert("Атыңызды киргизиңиз!"); return; }
     setIsSaving(true);
     try {
-      // API дарегиңизди бул жерге жазыңыз
-      await new Promise(res => setTimeout(res, 1500)); // Симуляция
+      // API логикасы бул жерге келет
+      await new Promise(res => setTimeout(res, 1500)); 
       setIsSaved(true);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
@@ -131,9 +96,8 @@ const Reading: React.FC = () => {
 
       {!showResult ? (
         <>
-          {/* Progress Bar */}
           <div style={styles.progressBarBg}>
-            <div style={{...styles.progressBarFill, width: `${((currentQuestion + 1) / questions.length) * 100}%`}}></div>
+            <div style={{...styles.progressBarFill, width: `${((currentQuestion + 1) / totalQuestions) * 100}%`}}></div>
           </div>
 
           <div style={styles.layout}>
@@ -142,7 +106,7 @@ const Reading: React.FC = () => {
               <div style={styles.passageHeader}>
                 <div style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
                   <FaBookOpen color="#EF4444" />
-                  <h3 style={styles.passageTitle}>{passage.title}</h3>
+                  <h3 style={styles.passageTitle}>{readingPassage.title}</h3>
                 </div>
                 <div style={styles.fontSizeControls}>
                   <button onClick={() => setFontSize(f => Math.max(14, f - 2))} style={styles.iconBtn}><FaSearchMinus /></button>
@@ -151,7 +115,7 @@ const Reading: React.FC = () => {
                 </div>
               </div>
               <div style={{...styles.passageBody, fontSize: `${fontSize}px`}}>
-                {passage.content}
+                {readingPassage.content}
               </div>
               <div style={styles.tipBox}>
                 <FaLightbulb color="#F59E0B" />
@@ -162,13 +126,13 @@ const Reading: React.FC = () => {
             {/* Суроо тарабы */}
             <div style={styles.questionSide}>
               <div style={styles.progressHeader}>
-                СУРОО {currentQuestion + 1} / {questions.length}
+                СУРОО {currentQuestion + 1} / {totalQuestions}
               </div>
-              <h2 style={styles.questionTitle}>{questions[currentQuestion].question}</h2>
+              <h2 style={styles.questionTitle}>{currentQ.question}</h2>
               
               <div style={styles.optionsList}>
-                {questions[currentQuestion].options.map((opt, idx) => {
-                  const isCorrect = idx === questions[currentQuestion].correct;
+                {currentQ.options.map((opt: string, idx: number) => {
+                  const isCorrect = idx === currentQ.correct;
                   const isSelected = selectedAnswer === idx;
                   return (
                     <button
@@ -179,6 +143,7 @@ const Reading: React.FC = () => {
                         ...styles.optBtn,
                         borderColor: isSelected ? (isCorrect ? '#10B981' : '#EF4444') : '#E2E8F0',
                         background: isSelected ? (isCorrect ? '#ECFDF5' : '#FEF2F2') : '#fff',
+                        cursor: selectedAnswer !== null ? 'default' : 'pointer'
                       }}
                     >
                       <span style={styles.optText}>{opt}</span>
@@ -190,22 +155,21 @@ const Reading: React.FC = () => {
 
               {selectedAnswer !== null && (
                 <div style={styles.explanationBox}>
-                  <strong>Түшүндүрмө:</strong> {questions[currentQuestion].explanation}
+                  <strong>Түшүндүрмө:</strong> {currentQ.explanation}
                 </div>
               )}
             </div>
           </div>
         </>
       ) : (
-        /* Жыйынтык картасы */
         <div style={styles.resultCard}>
           {!isSaved ? (
             <>
               <div style={styles.circleProgress}>
-                <span style={styles.circleScore}>{Math.round((score/questions.length)*100)}%</span>
+                <span style={styles.circleScore}>{Math.round((score/totalQuestions)*100)}%</span>
               </div>
               <h2 style={styles.resultTitle}>Азаматсыз!</h2>
-              <p style={styles.resultScore}>Сиз {questions.length} суроодон <b>{score}</b> упай алдыңыз.</p>
+              <p style={styles.resultScore}>Сиз {totalQuestions} суроодон <b>{score}</b> упай алдыңыз.</p>
               
               <div style={styles.saveSection}>
                 <input 
@@ -236,6 +200,10 @@ const Reading: React.FC = () => {
           )}
         </div>
       )}
+      <style>{`
+        .spinner { animation: spin 1s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+      `}</style>
     </div>
   );
 };

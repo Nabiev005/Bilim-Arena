@@ -125,7 +125,7 @@ const AuthorPage: React.FC = () => {
               <div style={styles.profileHeader}>
                 <div style={styles.avatarLarge}>Ai</div>
                 <div style={styles.nameSection}>
-                  <h2 style={styles.name}>AiNabi Dev Team</h2>
+                  <h2 style={styles.name}>Bilim Arena</h2>
                   <p style={styles.role}>Кыргыз тилдүү билим берүү экосистемасы</p>
                   <div style={styles.badgeRow}>
                     <span style={styles.verifiedBadge}>● Verified System</span>
@@ -139,7 +139,7 @@ const AuthorPage: React.FC = () => {
               <div style={styles.section}>
                 <h3 style={styles.sectionHeading}>Биз тууралуу</h3>
                 <p style={styles.text}>
-                  AiNabi — бул санариптик контентти кыргыз тилинде өнүктүрүүгө багытталган инновациялык платформа. 
+                  Bilim Arena — бул санариптик контентти кыргыз тилинде өнүктүрүүгө багытталган инновациялык платформа. 
                 </p>
               </div>
 
