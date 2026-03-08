@@ -20,7 +20,8 @@ import KyrgyzLanguage from './pages/ORT/KyrgyzLanguage';
 import Reading from './pages/ORT/Reading';
 import Leaderboard from './pages/ORT/Leaderboard';
 import AkTerekGame from './pages/AkTerekGame';
-import AdminPage from './pages/ORT/AdminPage';
+import AdminPage from './pages/YurtaGame';
+import YurtaGame from './pages/YurtaGame';
 
 function App() {
   // 1. Учурдагы даректи аныктайбыз
@@ -62,6 +63,7 @@ function App() {
           <Route path="/ort/reading" element={<Reading />} />
           <Route path="/ort/leaderboard" element={<Leaderboard />} />
           <Route path="/ak-terek" element={<AkTerekGame />} />
+          <Route path="/yurta-game" element={<YurtaGame />} />
           
           {/* Админ панель */}
           <Route path="/admin-panel" element={<AdminPage />} />

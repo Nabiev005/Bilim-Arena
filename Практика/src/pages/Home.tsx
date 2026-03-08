@@ -116,6 +116,17 @@ const Home: React.FC = () => {
       status: 'Популярдуу',
       category: 'Тарых',
       players: '100+'
+    },
+    {
+      id: 'yurta-builder',
+      title: 'Боз үй кура',
+      description: 'Көчмөн маданиятынын керемети — боз үйдү өз колуңуз менен ирети менен тигип үйрөнүңүз!',
+      icon: '⛺', // Же '🏠' иконкасы
+      color: '#EFEBE9', // Ачык боз/кийиздин түсү, боз үйгө абдан жарашат
+      path: '/yurta-game',
+      status: 'Жаңы',
+      category: 'Маданият',
+      players: '50+'
     }
   ];
 
