@@ -22,6 +22,7 @@ import Leaderboard from './pages/ORT/Leaderboard';
 import AkTerekGame from './pages/AkTerekGame';
 import AdminPage from './pages/YurtaGame';
 import YurtaGame from './pages/YurtaGame';
+import MathKokBoru from './pages/MathKokBoru';
 
 function App() {
   // 1. Учурдагы даректи аныктайбыз
@@ -64,6 +65,7 @@ function App() {
           <Route path="/ort/leaderboard" element={<Leaderboard />} />
           <Route path="/ak-terek" element={<AkTerekGame />} />
           <Route path="/yurta-game" element={<YurtaGame />} />
+          <Route path="/kok-boru-game" element={<MathKokBoru />} />
           
           {/* Админ панель */}
           <Route path="/admin-panel" element={<AdminPage />} />
