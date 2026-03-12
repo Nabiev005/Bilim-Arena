@@ -12,8 +12,7 @@ const ToguzKorgool: React.FC = () => {
   const [message, setMessage] = useState("1-оюнчунун кадамы");
 
   // Экрандын өлчөмүн көзөмөлдөө (адаптивдүүлүк үчүн)
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [, setIsMobile] = useState(window.innerWidth < 768);
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
