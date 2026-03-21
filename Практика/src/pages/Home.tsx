@@ -149,6 +149,17 @@ const Home: React.FC = () => {
       status: 'Жаңы',
       category: 'IT & Логика',
       players: '50+'
+    },
+    {
+      id: 'algorithmic-path',
+      title: 'Код Көчү: If/Else',
+      description: 'Алгоритмди туура түзүп, программист баланы серверге жеткириңиз. Логикалык шарттарды колдонууну үйрөнүңүз.',
+      icon: '👨‍💻',
+      color: '#4ec9b0',
+      path: '/algorithmic-path',
+      status: 'Жаңы',
+      category: 'IT & Логика',
+      players: '80+'
     }
   ];
 

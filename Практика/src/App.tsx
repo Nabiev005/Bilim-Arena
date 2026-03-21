@@ -24,6 +24,7 @@ import AdminPage from './pages/YurtaGame';
 import YurtaGame from './pages/YurtaGame';
 import MathKokBoru from './pages/MathKokBoru';
 import CyberShield from './pages/CyberShield';
+import AlgorithmicPath from './pages/AlgorithmicPath';
 
 function App() {
   // 1. Учурдагы даректи аныктайбыз
@@ -68,7 +69,7 @@ function App() {
           <Route path="/yurta-game" element={<YurtaGame />} />
           <Route path="/kok-boru-game" element={<MathKokBoru />} />
           <Route path="/cyber-shield" element={<CyberShield />} />
-          
+          <Route path="/algorithmic-path" element={<AlgorithmicPath />} />
           {/* Админ панель */}
           <Route path="/admin-panel" element={<AdminPage />} />
         </Routes>
