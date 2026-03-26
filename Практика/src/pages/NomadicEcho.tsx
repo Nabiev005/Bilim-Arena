@@ -18,10 +18,15 @@ const NomadicEcho: React.FC = () => {
   // 2. Үн ойнотуу функциясы
   const playEcho = useCallback((type: 'path' | 'wall' | 'win') => {
     const sounds = {
-      path: 'https://actions.google.com/sounds/v1/foley/wind_chime_single.ogg',
-      wall: 'https://actions.google.com/sounds/v1/foley/stone_hit.ogg',
-      win: 'https://actions.google.com/sounds/v1/celebration/victory_fanfare.ogg'
-    };
+  // Жол ачык болгондогу жагымдуу үн (комузга окшош "плинк" добушу)
+  path: 'https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3', 
+  
+  // Аскага тийгендеги "дүң" деген ката үнү
+  wall: 'https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3', 
+  
+  // Жеңишке жеткендеги майрамдык үн
+  win: 'https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3'
+};
 
     const audio = new Audio(sounds[type]);
     audio.volume = 0.4;

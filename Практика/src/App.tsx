@@ -25,6 +25,9 @@ import YurtaGame from './pages/YurtaGame';
 import MathKokBoru from './pages/MathKokBoru';
 import CyberShield from './pages/CyberShield';
 import AlgorithmicPath from './pages/AlgorithmicPath';
+import OrdoSQL from './pages/OrdoSQL';
+import BeshTash from './pages/BeshTash';
+import KyzKuumaiEncryption from './pages/KyzKuumaiEncryption';
 
 function App() {
   // 1. Учурдагы даректи аныктайбыз
@@ -70,6 +73,9 @@ function App() {
           <Route path="/kok-boru-game" element={<MathKokBoru />} />
           <Route path="/cyber-shield" element={<CyberShield />} />
           <Route path="/algorithmic-path" element={<AlgorithmicPath />} />
+          <Route path="/ordo-sql" element={<OrdoSQL />} />
+          <Route path="/besh-tash" element={<BeshTash />} />
+          <Route path="/kyz-kuumai-encryption" element={<KyzKuumaiEncryption />} />
           {/* Админ панель */}
           <Route path="/admin-panel" element={<AdminPage />} />
         </Routes>
