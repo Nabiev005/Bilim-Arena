@@ -1,4 +1,5 @@
-import { Routes, Route, useLocation } from 'react-router-dom'; // useLocation кошулду
+import { useState, useEffect } from 'react'; // useState жана useEffect кошулду
+import { Routes, Route, useLocation } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import Home from './pages/Home';
 import GrammarGame from './pages/GrammarGame';
@@ -30,23 +31,41 @@ import BeshTash from './pages/BeshTash';
 import KyzKuumaiEncryption from './pages/KyzKuumaiEncryption';
 
 function App() {
-  // 1. Учурдагы даректи аныктайбыз
   const location = useLocation();
-  
-  // 2. Эгер дарек '/admin-panel' болсо, isAdminPage true болот
   const isAdminPage = location.pathname === '/admin-panel';
 
-  return (
-    <div style={{ display: 'flex', minHeight: '100vh' }}>
-      {/* 3. Эгер админ панелде эмес болсок гана Sidebar көрсөтүлөт */}
-      {!isAdminPage && <Sidebar />}
+  // --- МОБИЛДИК ЭКРАНДЫ АНЫКТОО ---
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
-      {/* 4. Негизги мазмун оң жакта турат. Админ панелде marginLeft болбойт */}
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const isMobile = windowWidth < 768; // 768px'ден кичине болсо мобилдик деп эсептелет
+  // --------------------------------
+
+  return (
+    <div style={{ 
+      display: 'flex', 
+      flexDirection: isMobile ? 'column' : 'row', // Телефондо Sidebar менен Main бири-биринин астында болот
+      minHeight: '100vh',
+      width: '100%',
+      overflowX: 'hidden' 
+    }}>
+      
+      {/* Эгер админ панелде эмес болсок ЖАНА экран компьютердики болсо Sidebar көрсөтүлөт */}
+      {/* Мобилдик версияда Sidebar'ды өзүнчө меню катары (Burger menu) кылсаң болот, азырынча кысылбашы үчүн жашырдык */}
+      {!isAdminPage && !isMobile && <Sidebar />}
+
       <main style={{ 
         flex: 1, 
         background: '#F8FAFC', 
         position: 'relative',
-        width: '100%' 
+        width: '100%',
+        minWidth: '0', // Маанилүү: Контенттин ичкерип кетүүсүн алдын алат
+        padding: isMobile ? '0px' : '0px' // Кааласаң телефонго кошумча паддинг берсең болот
       }}>
         <Routes>
           <Route path="/" element={<Home />} />
@@ -76,7 +95,6 @@ function App() {
           <Route path="/ordo-sql" element={<OrdoSQL />} />
           <Route path="/besh-tash" element={<BeshTash />} />
           <Route path="/kyz-kuumai-encryption" element={<KyzKuumaiEncryption />} />
-          {/* Админ панель */}
           <Route path="/admin-panel" element={<AdminPage />} />
         </Routes>
       </main>
