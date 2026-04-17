@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { NavLink } from 'react-router-dom';
 import { 
-  FaWhatsapp, FaInstagram, FaTelegramPlane,
+  FaWhatsapp, FaInstagram, FaTelegramPlane, 
   FaHome, FaBook, FaQuoteLeft, FaHorse, FaMoon, FaBullseye, FaTrophy, 
-  FaGraduationCap, FaShieldAlt
+  FaGraduationCap, FaShieldAlt, FaStar // FaStar кошулду
 } from 'react-icons/fa';
-import { HiMenuAlt2, HiChevronLeft, HiX } from 'react-icons/hi'; // HiX кошулду
-
+import { HiMenuAlt2, HiChevronLeft, HiX } from 'react-icons/hi';
 import logoImg from '../assets/logo2.png'; 
 
 const Sidebar: React.FC = () => {
@@ -16,7 +15,6 @@ const Sidebar: React.FC = () => {
   const handleResize = useCallback(() => {
     const width = window.innerWidth;
     setWindowWidth(width);
-    
     if (width > 1024) {
       setIsOpen(true);
     } else if (width <= 768) {
@@ -31,12 +29,22 @@ const Sidebar: React.FC = () => {
 
   const isMobile = windowWidth <= 768;
 
+  // Түрк тили үчүн атайын иконка компоненти
+  const TurkishIcon = () => (
+    <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '20px' }}>
+      <FaMoon style={{ transform: 'rotate(-20deg)', fontSize: '16px' }} />
+      <FaStar style={{ fontSize: '8px', position: 'absolute', right: '-4px', top: '2px' }} />
+    </div>
+  );
+
   const sections = [
     {
       title: 'Негизги',
       items: [
         { name: 'Башкы бет', icon: <FaHome />, path: '/', hit: false },
         { name: 'ЖРТ Аренасы', icon: <FaGraduationCap />, path: '/ort-prep', hit: false, new: true },
+        // eslint-disable-next-line react-hooks/static-components
+        { name: 'Түрк тили', icon: <TurkishIcon />, path: '/turkish', hit: false, new: true, isTurkish: true },
       ]
     },
     {
@@ -81,24 +89,18 @@ const Sidebar: React.FC = () => {
           width: isOpen ? '280px' : (isMobile ? '0px' : '85px'),
           transform: isMobile && !isOpen ? 'translateX(-100%)' : 'translateX(0)',
           visibility: isMobile && !isOpen ? 'hidden' : 'visible',
-          // Мобилдикте көлөкө кошуп, ажыратып көрсөтүү үчүн
           boxShadow: isMobile && isOpen ? '10px 0 30px rgba(0,0,0,0.1)' : 'none',
         }}
       >
-        
         <div style={{
           ...styles.header,
           justifyContent: isOpen ? 'space-between' : 'center',
-          padding: isOpen ? '0 10px 0 15px' : '0'
+          padding: isOpen ? '0 15px' : '0'
         }}>
           {isOpen && (
             <div style={styles.logoWrapper}>
-              <div style={styles.logoIcon} aria-hidden="true">
-                <img 
-                  src={logoImg} 
-                  alt="Bilim Arena Logo" 
-                  style={{ width: '100%', height: '100%', objectFit: 'contain' }} 
-                />
+              <div style={styles.logoIcon}>
+                <img src={logoImg} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
               </div>
               <div style={{ display: 'flex', flexDirection: 'column' }}>
                 <h2 style={styles.logoText}>BILIM</h2>
@@ -106,12 +108,8 @@ const Sidebar: React.FC = () => {
               </div>
             </div>
           )}
-          {/* Десктоп версиядагы жебе (Мобилдикте жашырылат) */}
           {!isMobile && (
-            <button 
-              onClick={() => setIsOpen(!isOpen)} 
-              style={styles.toggleBtn}
-            >
+            <button onClick={() => setIsOpen(!isOpen)} style={styles.toggleBtn}>
               {isOpen ? <HiChevronLeft size={20} /> : <HiMenuAlt2 size={20} />}
             </button>
           )}
@@ -120,11 +118,7 @@ const Sidebar: React.FC = () => {
         <div style={styles.menuContainer} className="custom-scrollbar">
           {sections.map((section, sIdx) => (
             <section key={`sec-${sIdx}`} style={{ marginBottom: '25px' }}>
-              {isOpen && (
-                <p style={styles.sectionTitle}>
-                  {section.title}
-                </p>
-              )}
+              {isOpen && <p style={styles.sectionTitle}>{section.title}</p>}
 
               {section.items.map((item, index) => (
                 <NavLink
@@ -133,23 +127,23 @@ const Sidebar: React.FC = () => {
                   onClick={() => isMobile && setIsOpen(false)}
                   style={({ isActive }) => ({
                     ...styles.menuItem,
-                    backgroundColor: isActive ? '#f0f7ff' : 'transparent',
-                    color: isActive ? '#3B82F6' : '#64748b',
+                    backgroundColor: isActive ? (item.isTurkish ? '#fff1f1' : '#f0f7ff') : 'transparent',
+                    color: isActive ? (item.isTurkish ? '#E30A17' : '#3B82F6') : '#64748b',
                     justifyContent: isOpen ? 'flex-start' : 'center',
-                    borderLeft: isActive && isOpen ? '4px solid #3B82F6' : '4px solid transparent',
+                    borderLeft: isActive && isOpen ? `4px solid ${item.isTurkish ? '#E30A17' : '#3B82F6'}` : '4px solid transparent',
                   })}
                 >
                   <span style={{
                     ...styles.icon,
-                    color: item.new ? '#48BB78' : 'inherit'
-                  }} aria-hidden="true">{item.icon}</span>
+                    color: item.isTurkish ? '#E30A17' : (item.new ? '#48BB78' : 'inherit')
+                  }}>{item.icon}</span>
                   
                   {isOpen && <span style={styles.name}>{item.name}</span>}
                   
                   {isOpen && (
                     <div style={{ marginLeft: 'auto', display: 'flex', gap: '5px' }}>
                       {item.hit && <span style={styles.hitBadge}>TOP</span>}
-                      {item.new && <span style={styles.newBadge}>NEW</span>}
+                      {item.new && <span style={{...styles.newBadge, background: item.isTurkish ? '#E30A17' : '#48BB78'}}>NEW</span>}
                     </div>
                   )}
                 </NavLink>
@@ -166,36 +160,24 @@ const Sidebar: React.FC = () => {
           {isOpen && (
             <div style={styles.socialIcons}>
               {socialLinks.map((link, idx) => (
-                <a 
-                  key={`soc-${idx}`} 
-                  href={link.url} 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  style={{...styles.socialIcon, color: link.color}}
-                  aria-label={link.name}
-                >
+                <a key={idx} href={link.url} target="_blank" rel="noopener noreferrer" style={{...styles.socialIcon, color: link.color}}>
                   {link.icon}
                 </a>
               ))}
             </div>
           )}
-          <p style={styles.footerText}>
-            {isOpen ? 'v2.0.1 | © 2026 Bilim Arena' : 'v2.0'}
-          </p>
+          <p style={styles.footerText}>{isOpen ? 'v2.0.1 | © 2026 Bilim Arena' : 'v2.0'}</p>
         </div>
       </nav>
 
-      {/* ЖАҢЫ МОБИЛДИК БУРГЕР (Floating Button) */}
       {isMobile && (
         <button 
           onClick={() => setIsOpen(!isOpen)} 
           style={{
             ...styles.mobileBurgerBtn,
-            // Эгер меню ачык болсо, кнопка оңго жылат (Sidebar ичине киргендей болот) же өңүн өзгөртөт
             left: isOpen ? '230px' : '20px',
-            backgroundColor: isOpen ? '#3B82F6' : '#ffffff',
-            color: isOpen ? '#ffffff' : '#3B82F6',
-            transform: `rotate(${isOpen ? '180deg' : '0deg'})`,
+            backgroundColor: isOpen ? '#1e293b' : '#ffffff',
+            color: isOpen ? '#ffffff' : '#1e293b',
           }}
         >
           {isOpen ? <HiX /> : <HiMenuAlt2 />}
@@ -203,11 +185,7 @@ const Sidebar: React.FC = () => {
       )}
 
       {!isMobile && (
-        <div style={{ 
-          width: isOpen ? '280px' : '85px', 
-          transition: 'width 0.3s ease',
-          flexShrink: 0 
-        }} />
+        <div style={{ width: isOpen ? '280px' : '85px', transition: 'width 0.4s ease', flexShrink: 0 }} />
       )}
     </>
   );
@@ -222,7 +200,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     background: '#ffffff',
     borderRight: '1px solid #f1f5f9',
     padding: '25px 0',
-    transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1)', // Анимация жумшартылды
+    transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1)',
     zIndex: 1001,
     display: 'flex',
     flexDirection: 'column',
@@ -234,106 +212,63 @@ const styles: { [key: string]: React.CSSProperties } = {
     left: 0,
     width: '100vw',
     height: '100vh',
-    background: 'rgba(15, 23, 42, 0.3)',
-    backdropFilter: 'blur(8px)', // Блур көбөйтүлдү
+    background: 'rgba(15, 23, 42, 0.4)',
+    backdropFilter: 'blur(5px)',
     zIndex: 1000,
-    transition: 'opacity 0.3s ease'
   },
   mobileBurgerBtn: {
     position: 'fixed',
     top: '20px',
-    zIndex: 1100, // Sidebar'дан да жогору туруш керек
+    zIndex: 1100,
     width: '45px',
     height: '45px',
     borderRadius: '12px',
     border: 'none',
-    boxShadow: '0 10px 25px rgba(59, 130, 246, 0.25)',
+    boxShadow: '0 8px 20px rgba(0,0,0,0.1)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     fontSize: '22px',
     cursor: 'pointer',
-    transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)', // Пружина эффекти
+    transition: 'all 0.4s ease',
   },
-  header: { 
-    display: 'flex', 
-    alignItems: 'center', 
-    marginBottom: '35px', 
-    minHeight: '50px' 
-  },
-  logoWrapper: { display: 'flex', alignItems: 'center', gap: '10px' },
-  logoIcon: { 
-    width: '45px', 
-    height: '45px', 
-    display: 'flex', 
-    alignItems: 'center', 
-    justifyContent: 'center', 
-    borderRadius: '12px',
-    background: 'transparent',
-    overflow: 'hidden'
-  },
-  logoText: { color: '#1e293b', fontSize: '18px', margin: 0, fontWeight: '900', letterSpacing: '1px', lineHeight: 1 },
-  logoSubtext: { color: '#3B82F6', fontSize: '14px', fontWeight: '800', letterSpacing: '2px' },
+  header: { display: 'flex', alignItems: 'center', marginBottom: '35px', minHeight: '50px' },
+  logoWrapper: { display: 'flex', alignItems: 'center', gap: '12px' },
+  logoIcon: { width: '40px', height: '40px' },
+  logoText: { color: '#1e293b', fontSize: '18px', margin: 0, fontWeight: '900', lineHeight: 1 },
+  logoSubtext: { color: '#3B82F6', fontSize: '13px', fontWeight: '800', letterSpacing: '2px' },
   toggleBtn: {
     background: '#f8fafc',
-    border: '1px solid #f1f5f9',
-    borderRadius: '10px',
-    width: '36px',
-    height: '36px',
+    border: 'none',
+    borderRadius: '8px',
+    width: '32px',
+    height: '32px',
     cursor: 'pointer',
     color: '#94a3b8',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  menuContainer: { 
-    flex: 1, 
-    overflowY: 'auto', 
-    padding: '0 15px'
-  },
-  sectionTitle: { 
-    fontSize: '10px', 
-    color: '#94a3b8', 
-    fontWeight: '800', 
-    letterSpacing: '1px', 
-    marginBottom: '10px', 
-    textTransform: 'uppercase',
-    paddingLeft: '15px'
-  },
+  menuContainer: { flex: 1, overflowY: 'auto', padding: '0 12px' },
+  sectionTitle: { fontSize: '10px', color: '#cbd5e1', fontWeight: '800', textTransform: 'uppercase', marginBottom: '12px', paddingLeft: '16px' },
   menuItem: {
     display: 'flex',
     alignItems: 'center',
-    padding: '14px 16px',
-    borderRadius: '14px', // Бардык бурчу тегеректелди
-    marginBottom: '6px',
-    transition: 'all 0.2s ease',
-    gap: '14px',
+    padding: '12px 16px',
+    borderRadius: '12px',
+    marginBottom: '4px',
+    transition: 'all 0.3s ease',
+    gap: '12px',
     textDecoration: 'none',
   },
-  icon: { fontSize: '20px', display: 'flex', alignItems: 'center' },
-  name: { fontSize: '15px', fontWeight: '700', whiteSpace: 'nowrap' },
-  hitBadge: { background: '#ff4d4d', color: '#fff', fontSize: '8px', padding: '2px 6px', borderRadius: '4px', fontWeight: '900' },
-  newBadge: { background: '#48BB78', color: '#fff', fontSize: '8px', padding: '2px 6px', borderRadius: '4px', fontWeight: '900' },
-  footer: { 
-    marginTop: 'auto', 
-    borderTop: '1px solid #f8fafc', 
-    display: 'flex', 
-    flexDirection: 'column', 
-    gap: '15px' 
-  },
-  socialIcons: { display: 'flex', gap: '8px', paddingLeft: '15px' },
-  socialIcon: {
-    fontSize: '18px',
-    width: '35px',
-    height: '35px',
-    borderRadius: '10px',
-    background: '#f8fafc',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    border: '1px solid #f1f5f9',
-  },
-  footerText: { fontSize: '11px', color: '#cbd5e1', fontWeight: '600', paddingLeft: '15px' }
+  icon: { fontSize: '18px', display: 'flex', alignItems: 'center' },
+  name: { fontSize: '14px', fontWeight: '700', whiteSpace: 'nowrap' },
+  hitBadge: { background: '#ef4444', color: '#fff', fontSize: '8px', padding: '2px 6px', borderRadius: '4px', fontWeight: '900' },
+  newBadge: { color: '#fff', fontSize: '8px', padding: '2px 6px', borderRadius: '4px', fontWeight: '900' },
+  footer: { marginTop: 'auto', borderTop: '1px solid #f1f5f9', display: 'flex', flexDirection: 'column', gap: '10px' },
+  socialIcons: { display: 'flex', gap: '10px', paddingLeft: '16px' },
+  socialIcon: { fontSize: '18px', width: '32px', height: '32px', borderRadius: '8px', background: '#f8fafc', display: 'flex', alignItems: 'center', justifyContent: 'center' },
+  footerText: { fontSize: '10px', color: '#94a3b8', fontWeight: '600', paddingLeft: '16px' }
 };
 
 export default Sidebar;

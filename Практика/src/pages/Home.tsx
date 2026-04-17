@@ -23,6 +23,17 @@ const Home: React.FC = () => {
   // Мемоизация оюндардын тизмеси
   const games = useMemo(() => [
     { id: 'ort', title: 'ЖРТ Аренасы', description: 'Математика, Аналогия жана Текстти түшүнүү. Өз билимиңди сынап, жогорку упай топто!', icon: '🎓', color: '#E3F2FD', path: '/ort-prep', status: 'Хит', category: 'Билим', players: '10.5k' },
+    { 
+    id: 'turkish-learning', 
+    title: 'Түрк тили (Türkçe)', 
+    description: 'Түрк тилин нөлдөн баштап үйрөнүңүз: Грамматика, сөздүк жана күнүмдүк сүйлөшүү практикасы.', 
+    icon: '🇹🇷', 
+    color: '#FFE5E5', 
+    path: '/turkish', // Бул жолду (route) кийин түзөсүң
+    status: 'Жаңы', 
+    category: 'Тил', 
+    players: '0' 
+  },
     { id: 'toguz', title: 'Тогуз Коргоол', description: 'Кыргыздын интеллектуалдык мурасы. Аренада стратегиялык акыл-эс таймашына кошулуңуз.', icon: '🪵', color: '#FFE0B2', path: '/toguz', status: 'Эксклюзив', category: 'Логика', players: '5.2k' },
     { id: 'chuko', title: 'Чүкө Атуу', description: 'Сака менен чүкөлөрдү көздөй атып, "Алчы" түшүрүп упай топтоңуз.', icon: '🦴', color: '#C6F6D5', path: '/chuko', status: 'Жаңы', category: 'Логика', players: '950' },
     { id: 'wordgame', title: "Ким Көп Билет?", description: "Берилген тамгадан башталган сөздөрдү тез таап, сөз байлыгыңызды сынаңыз!", icon: "🧠", color: "#D1FAE5", path: "/wordgame", category: "Тил", players: "1.2к" },

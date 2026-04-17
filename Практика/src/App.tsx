@@ -29,6 +29,9 @@ import AlgorithmicPath from './pages/AlgorithmicPath';
 import OrdoSQL from './pages/OrdoSQL';
 import BeshTash from './pages/BeshTash';
 import KyzKuumaiEncryption from './pages/KyzKuumaiEncryption';
+import TurkishHome from './pages/Turkish/TurkishHome';
+import VocabularyQuiz from './pages/Turkish/VocabularyQuiz';
+import GrammarLesson from './pages/Turkish/GrammarLesson';
 
 function App() {
   const location = useLocation();
@@ -95,6 +98,9 @@ function App() {
           <Route path="/ordo-sql" element={<OrdoSQL />} />
           <Route path="/besh-tash" element={<BeshTash />} />
           <Route path="/kyz-kuumai-encryption" element={<KyzKuumaiEncryption />} />
+          <Route path="/turkish" element={<TurkishHome />} />
+          <Route path="/turkish/vocabulary" element={<VocabularyQuiz />} />
+          <Route path="/turkish/grammar" element={<GrammarLesson />} />
           <Route path="/admin-panel" element={<AdminPage />} />
         </Routes>
       </main>
